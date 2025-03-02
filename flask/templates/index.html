@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi TEST</title>
+    <!-- Подключаем Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<style>
+    .custom-btn {
+        color: #0d6efd; /* Синий цвет текста */
+        border: 2px solid #0d6efd; /* Синяя рамка */
+        background-color: transparent; /* Прозрачный фон */
+        transition: all 0.3s ease; /* Плавный переход */
+    }
+    .custom-btn:hover {
+        color: white; /* Белый цвет текста при наведении */
+        background-color: #0d6efd; /* Синий фон при наведении */
+    }
+</style>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Mobi TEST</h1>
+                <p class="card-text">Используйте кнопку ниже для Получения описания изображения.</p>
+                <a href="/upload" class="btn custom-btn">Обработать изображение</a>
+                <br><br>
+                <p class="card-text">Так же можно посмотреть все запросы на обработку изображений.</p>
+                <a href="/show" class="btn custom-btn">Список изображений</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
