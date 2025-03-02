@@ -55,7 +55,7 @@ async def image_create_description(file: UploadFile):
         db_image = ImageUpload(
             file_name=file.filename,
             description=russian_text,
-            timestamp=datetime.now(),
+            timestamp=datetime.utcnow(),
             comment='Обработано успешно'
         )
         db.add(db_image)
@@ -67,7 +67,7 @@ async def image_create_description(file: UploadFile):
         db_image = ImageUpload(
             file_name=file.filename,
             description='Не удалось обработать изображение',
-            timestamp=datetime.now(),
+            timestamp=datetime.utcnow(),
             comment=str(exc)
         )
         db.add(db_image)
