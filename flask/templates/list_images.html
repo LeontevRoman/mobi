@@ -68,7 +68,7 @@
                         <td>${item.file_name}</td>
                         <td>${item.timestamp}</td>
                         <td>${item.description}</td>
-                        <td>${item.comment || ''}</td> <!-- Если комментарий null, отображаем пустую строку -->
+                        <td>${item.status || ''}</td> <!-- Если комментарий null, отображаем пустую строку -->
                     `;
                     tableBody.appendChild(row);
                 });
