@@ -13,6 +13,7 @@ logging.basicConfig(
     handlers=[
         RotatingFileHandler(
             os.path.join(log_dir, "app.log"), 
+            encoding='utf-8', 
             maxBytes=10 * 1024 * 1024, 
             backupCount=5  
         ),

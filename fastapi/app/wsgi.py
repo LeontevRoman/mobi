@@ -1,11 +1,10 @@
 
-import os
 from fastapi import FastAPI, Request
 from starlette.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
-from app.database import Base, engine, models
+
+from app.database import Base, engine
 from app.routers import tags_metadata, mobi_test
 from app.logging import logger
 
@@ -37,5 +36,3 @@ async def docs_redirect():
     return RedirectResponse(url='/docs')
 
 app.include_router(mobi_test)
-
-

@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from pydantic import BaseModel, validator
 
@@ -14,7 +13,7 @@ class ImageUploadResponse(BaseModel):
     @validator('timestamp', pre=True)
     def format_timestamp(cls, value):
         if isinstance(value, datetime):
-            return value.strftime("%d-%m-%Y %H:%M:%S")  # Кастомный формат
+            return value.strftime("%d-%m-%Y %H:%M:%S")
         return value
 
     class Config:

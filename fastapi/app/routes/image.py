@@ -3,25 +3,25 @@ import io
 import traceback
 from typing import List
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, Form, HTTPException, UploadFile
 from PIL import Image
-from pydantic import BaseModel
 from sqlalchemy import desc
-from transformers import BlipProcessor, BlipForConditionalGeneration, MarianMTModel, MarianTokenizer
+from transformers import BlipProcessor, BlipForConditionalGeneration,MarianMTModel, MarianTokenizer
 
 from app.database import SessionLocal
 from app.database.models import ImageUpload
 from app.database.pydantic_models import ImageUploadResponse
+from app.logging import logger
 
 image_check = APIRouter(prefix="/image")
 
 @image_check.post("/create-description")
-async def image_create_description(file: UploadFile):
+async def image_create_description(file: UploadFile, lang: str = Form(...)):
     """     
     **/api/v1/mobi-test/image/create-description** \n
     Создать описание изображения \n
     **:return:** json
-    """ 
+    """
     db = SessionLocal()
     try:
          # Проверка типа изображения
@@ -36,25 +36,26 @@ async def image_create_description(file: UploadFile):
         
         # Загрузка модели и процессора
         processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+        models = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
         
         # Генерация описания
         inputs = processor(image_content, return_tensors="pt")
-        out = model.generate(**inputs)
+        out = models.generate(**inputs)
         caption = processor.decode(out[0], skip_special_tokens=True)
 
         # А если по-русски
-        model_name = "Helsinki-NLP/opus-mt-en-ru"
-        tokenizer = MarianTokenizer.from_pretrained(model_name)
-        model = MarianMTModel.from_pretrained(model_name)
-        inputs = tokenizer(caption, return_tensors="pt", max_length=512, truncation=True)
-        translated = model.generate(**inputs)
-        russian_text = tokenizer.decode(translated[0], skip_special_tokens=True)
+        if lang.lower() == "true":
+            model_name = "Helsinki-NLP/opus-mt-en-ru"
+            tokenizer = MarianTokenizer.from_pretrained(model_name)
+            model = MarianMTModel.from_pretrained(model_name)
+            inputs = tokenizer(caption, return_tensors="pt", max_length=512, truncation=True)
+            translated = model.generate(**inputs)
+            caption = tokenizer.decode(translated[0], skip_special_tokens=True)
 
         # Создание записи в базе данных
         db_image = ImageUpload(
             file_name=file.filename,
-            description=russian_text,
+            description=caption,
             timestamp=datetime.now(),
             comment='Обработано успешно'
         )
@@ -62,7 +63,7 @@ async def image_create_description(file: UploadFile):
         db.commit()
         db.refresh(db_image)
         
-        return {"description": russian_text}
+        return {"description": caption}
     except Exception as exc:
         db_image = ImageUpload(
             file_name=file.filename,
@@ -74,7 +75,7 @@ async def image_create_description(file: UploadFile):
         db.commit()
         db.refresh(db_image)
 
-        print(traceback.print_exc())
+        logger.error(f"Ошибка при обработке запроса: {str(exc)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(exc))
     finally:
         await file.close()
@@ -93,7 +94,7 @@ async def get_all():
         image_uploads = db.query(ImageUpload).order_by(desc(ImageUpload.timestamp)).all()
         return image_uploads
     except Exception as exc:
-        print(traceback.print_exc())
+        logger.error(f"Ошибка при обработке запроса: {str(exc)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(exc))
     finally:
         db.close()  
