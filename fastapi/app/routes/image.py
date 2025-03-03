@@ -57,7 +57,7 @@ async def image_create_description(file: UploadFile, lang: str = Form(...)):
             file_name=file.filename,
             description=caption,
             timestamp=datetime.now(),
-            comment='Обработано успешно'
+            status='Обработано успешно'
         )
         db.add(db_image)
         db.commit()
@@ -69,7 +69,7 @@ async def image_create_description(file: UploadFile, lang: str = Form(...)):
             file_name=file.filename,
             description='Не удалось обработать изображение',
             timestamp=datetime.now(),
-            comment=str(exc)
+            status=str(exc)
         )
         db.add(db_image)
         db.commit()

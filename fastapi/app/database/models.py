@@ -10,4 +10,4 @@ class ImageUpload(Base):
     file_name = Column(String)
     timestamp = Column(DateTime, unique=True, default=datetime.now())
     description = Column(String)
-    comment = Column(String)
+    status = Column(String)

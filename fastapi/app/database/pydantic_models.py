@@ -8,7 +8,7 @@ class ImageUploadResponse(BaseModel):
     file_name: str
     timestamp: str
     description: str
-    comment: str
+    status: str
 
     @validator('timestamp', pre=True)
     def format_timestamp(cls, value):
