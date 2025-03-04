@@ -6,14 +6,15 @@ from typing import List
 from fastapi import APIRouter, Form, HTTPException, UploadFile
 from PIL import Image
 from sqlalchemy import desc
-from transformers import BlipProcessor, BlipForConditionalGeneration,MarianMTModel, MarianTokenizer
+
 
 from app.database import SessionLocal
 from app.database.models import ImageUpload
 from app.database.pydantic_models import ImageUploadResponse
 from app.logging import logger
+from app.wsgi import app
 
-image_check = APIRouter(prefix="/image")
+image_check = APIRouter(prefix="/image", tags=["Image"])
 
 @image_check.post("/create-description")
 async def image_create_description(file: UploadFile, lang: str = Form(...)):
@@ -34,20 +35,16 @@ async def image_create_description(file: UploadFile, lang: str = Form(...)):
         image_stream = io.BytesIO(contents)
         image_content = Image.open(image_stream).convert("RGB")
         
-        # Загрузка модели и процессора
-        processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        models = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-        
         # Генерация описания
-        inputs = processor(image_content, return_tensors="pt")
-        out = models.generate(**inputs)
-        caption = processor.decode(out[0], skip_special_tokens=True)
+        inputs = app.state.blip_processor(image_content, return_tensors="pt")
+        out = app.state.blip_model.generate(**inputs)
+        caption = app.state.blip_processor.decode(out[0], skip_special_tokens=True)
 
         # А если по-русски
         if lang.lower() == "true":
             model_name = "Helsinki-NLP/opus-mt-en-ru"
-            tokenizer = MarianTokenizer.from_pretrained(model_name)
-            model = MarianMTModel.from_pretrained(model_name)
+            tokenizer = app.state.marian_tokenizer.from_pretrained(model_name)
+            model = app.state.marian_model.from_pretrained(model_name)
             inputs = tokenizer(caption, return_tensors="pt", max_length=512, truncation=True)
             translated = model.generate(**inputs)
             caption = tokenizer.decode(translated[0], skip_special_tokens=True)

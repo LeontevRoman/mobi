@@ -10,12 +10,12 @@ def index():
 
 @flask_app.route('/upload')
 def upload():
-    return render_template('upload.html', fastapi_url=Config.FASTAPI_URL)
+    return render_template('upload.html', fastapi_url=f'http://{Config.FASTAPI_HOST}:{Config.FASTAPI_PORT}')
 
 
 @flask_app.route('/show')
 def show():
-    return render_template('list_images.html', fastapi_url=Config.FASTAPI_URL)
+    return render_template('list_images.html', fastapi_url=f'http://{Config.FASTAPI_HOST}:{Config.FASTAPI_PORT}')
 
 
 if __name__ == '__main__':

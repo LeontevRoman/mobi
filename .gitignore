@@ -3,10 +3,10 @@
 */__pycache__/
 **/__pycache__/
 __pycache__/
-/.env
-/env/
+*.env
+*/env/
 /.vscode
 /app/logs
 /flask/env
-/fastapi/env
 /fastapi/app/logs
+.gradio

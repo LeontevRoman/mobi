@@ -1,12 +1,5 @@
 version: "3.8"
 services:
-  flask:
-    container_name: flask
-    build:
-      context: ./flask
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
   db:
     container_name: db
     image: postgres:13.3
@@ -21,9 +14,31 @@ services:
     build:
       context: ./fastapi
       dockerfile: Dockerfile
+    image: fastapi
     ports:
       - "5000:5000"
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432
+  gradio:
+      container_name: gradio
+      build:
+        context: ./gradio
+        dockerfile: Dockerfile
+      image: gradio
+      ports:
+        - "7000:7000"
+      environment:
+        - FASTAPI_HOST=fastapi
+        - FASTAPI_PORT=5000
+  flask:
+    container_name: flask
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    image: flask
+    ports:
+      - "8000:8000"

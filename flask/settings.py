@@ -10,8 +10,9 @@ if os.name == 'nt':
 else:
     locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')  # для UNIX
 
+use_docker = os.environ.get('USE_DOCKER', 'False').lower() == 'true'
 
 class Config(object):
 
-    FASTAPI_URL = 'http://localhost:5000'
-
+    FASTAPI_HOST = os.environ.get('FASTAPI_HOST', 'localhost')
+    FASTAPI_PORT = os.environ.get('FASTAPI_PORT', '5000')
